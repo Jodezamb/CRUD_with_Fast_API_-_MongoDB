@@ -3,7 +3,7 @@ from config.db import  conn  #importar el puntero de la base de datos
 from schemas.user import userEntity,usersEntity # importando los esquemas desde la car schemas
 from models.user import User
 from passlib.hash import sha256_crypt
-
+from bson import ObjectId
 
 
 user=APIRouter()
@@ -25,8 +25,9 @@ def create_users(user: User):
     
 
 @user.get('/users/{id}')
-def find_user():
-    return 'Hellow world'
+def find_user(id: str):
+    return userEntity(conn.local.user.find_one({"_id":ObjectId(id)}))
+    
 
 @user.put('/users/{id}')
 def update_user():
