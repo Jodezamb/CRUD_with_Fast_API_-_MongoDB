@@ -2,6 +2,10 @@ from fastapi import  APIRouter #  DEFINR TOAS LAS RUTAS QUE USAREMOS EN EL ARCHI
 from config.db import  conn  #importar el puntero de la base de datos 
 from schemas.user import userEntity,usersEntity # importando los esquemas desde la car schemas
 from models.user import User
+from passlib.hash import sha256_crypt
+
+
+
 user=APIRouter()
 
 
@@ -13,6 +17,7 @@ def find_all_users():
 @user.post('/users')
 def create_users(user: User):
     new_user=dict(user)
+    new_user["password"]=sha256_crypt.encrypt(new_user['password'])
     del new_user["id"]
     id= conn.local.user.insert_one(new_user).inserted_id
     user = conn.local.user.find_one({"_id":id})
