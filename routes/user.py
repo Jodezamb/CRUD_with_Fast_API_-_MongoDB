@@ -1,16 +1,23 @@
 from fastapi import  APIRouter #  DEFINR TOAS LAS RUTAS QUE USAREMOS EN EL ARCHIVO 
-
+from config.db import  conn  #importar el puntero de la base de datos 
+from schemas.user import userEntity,usersEntity # importando los esquemas desde la car schemas
+from models.user import User
 user=APIRouter()
 
 
 #primera ruta
 @user.get('/users')
 def find_all_users():
-    return 'Hellow world'
+    return usersEntity(conn.local.user.find())
 
 @user.post('/users')
-def create_users():
-    return 'Hellow world'
+def create_users(user: User):
+    new_user=dict(user)
+    del new_user["id"]
+    id= conn.local.user.insert_one(new_user).inserted_id
+    user = conn.local.user.find_one({"_id":id})
+    return userEntity(user)
+    
 
 @user.get('/users/{id}')
 def find_user():
